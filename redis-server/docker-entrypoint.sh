@@ -21,6 +21,11 @@ if [ -n "${REDIS_TIMEOUT}" ]; then
 	sed -i -E "s/^[ #]*timeout .*$/timeout ${REDIS_TIMEOUT}/" /usr/local/etc/redis/redis.conf
 fi
 
+if [ ! -z "$REDIS_PASSWORD" ]; then
+    sed -i -E "s/^[ #]*masterauth .*$/masterauth ${REDIS_PASSWORD}/" /usr/local/etc/redis/redis.conf
+    sed -i -E "s/^[ #]*requirepass .*$/requirepass ${REDIS_PASSWORD}/" /usr/local/etc/redis/redis.conf
+fi
+
 if [ "$my_ip" == "$master_ip" ]
 then
   sed -i -E "s/^ *slaveof/# slaveof/g" /usr/local/etc/redis/redis.conf
