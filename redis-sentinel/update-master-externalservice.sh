@@ -1,6 +1,7 @@
 #!/bin/bash
 
 REDIS_MASTER_UUID=$(curl -s http://rancher-metadata/latest/self/stack/services/redis-master/uuid)
+CATTLE_URL=$(echo $CATTLE_URL | sed -e 's/v1/v2-beta/')
 
 if [ "${REDIS_MASTER_UUID}" = 'Not found' ]; then
 	# Should create master.
