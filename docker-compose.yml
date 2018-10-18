@@ -2,9 +2,10 @@ version: '2'
 services:
 
   redis-sentinel:
-    image: uonappdev.azurecr.io/cache/redis-sentinel:dev
+    image: uonappdev.azurecr.io/cache/redis-sentinel:${VERSION}
     environment:
       SENTINEL_DOWN_AFTER_MILLISECONDS: '5000'
+      REDIS_PASSWORD: redis-in-docker-secret-password
     stdin_open: true
     tty: true
     labels:
@@ -15,7 +16,9 @@ services:
       io.rancher.container.pull_image: always
 
   redis-server:
-    image: uonappdev.azurecr.io/cache/redis-server:dev
+    image: uonappdev.azurecr.io/cache/redis-server:${VERSION}
+    environment:
+      REDIS_PASSWORD: redis-in-docker-secret-password
     stdin_open: true
     volumes:
       - /data_nfs/cache-data:/data:rw
