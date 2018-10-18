@@ -29,6 +29,10 @@ else
 	echo "*** WARNING: redis-master external service management disabled, add labels io.rancher.container.create_agent=true and io.rancher.container.agent.role=environment on redis-sentinel containers to enable it."
 fi
 
+if [ ! -z "$REDIS_PASSWORD" ]; then
+    sed -i -E "s/^[ #]*sentinel auth-pass ([A-z0-9._-]+) .*$/sentinel auth-pass \1 ${REDIS_PASSWORD}/" /usr/local/etc/redis/sentinel.conf
+fi
+
 if [ -n "${SENTINEL_DOWN_AFTER_MILLISECONDS}" ]; then
 	sed -i -E "s/^[ #]*sentinel down-after-milliseconds ([A-z0-9._-]+) .*$/sentinel down-after-milliseconds \1 ${SENTINEL_DOWN_AFTER_MILLISECONDS}/" /usr/local/etc/redis/sentinel.conf
 fi

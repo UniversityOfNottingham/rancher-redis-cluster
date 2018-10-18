@@ -2,6 +2,10 @@
 
 REDIS_MASTER_NAME=mymaster
 
+REDIS_DATA_FOLDER="/data/redis/$(hostname)"
+mkdir -p $REDIS_DATA_FOLDER
+chown redis:redis $REDIS_DATA_FOLDER
+
 giddyup service wait scale --timeout 120
 my_ip=$(giddyup ip myip)
 master_ip=$(giddyup leader get)
@@ -12,6 +16,7 @@ if redis-cli -h redis-sentinel -p 26379 ping; then
 fi
 
 sed -i -E "s/^ *bind +.*$/bind 0.0.0.0/g" /usr/local/etc/redis/redis.conf
+sed -i -E "s|^ *dir +.*$|dir ${REDIS_DATA_FOLDER}|g" /usr/local/etc/redis/redis.conf
 
 if [ "${REDIS_APPENDONLY}" = "yes" ]; then
 	sed -i -E "s/^ *appendonly +.*$/appendonly yes/g" /usr/local/etc/redis/redis.conf
@@ -19,6 +24,11 @@ fi
 
 if [ -n "${REDIS_TIMEOUT}" ]; then
 	sed -i -E "s/^[ #]*timeout .*$/timeout ${REDIS_TIMEOUT}/" /usr/local/etc/redis/redis.conf
+fi
+
+if [ ! -z "$REDIS_PASSWORD" ]; then
+    sed -i -E "s/^[ #]*masterauth .*$/masterauth ${REDIS_PASSWORD}/" /usr/local/etc/redis/redis.conf
+    sed -i -E "s/^[ #]*requirepass .*$/requirepass ${REDIS_PASSWORD}/" /usr/local/etc/redis/redis.conf
 fi
 
 if [ "$my_ip" == "$master_ip" ]
